@@ -1,7 +1,7 @@
 Lab 05 - La Quinta is Spanish for next to Denny’s, Pt. 2
 ================
-Insert your name here
-Insert date here
+Rachel Weiner
+February 12, 2026
 
 ### Load packages and data
 
@@ -14,32 +14,140 @@ library(dsbox)
 states <- read_csv("data/states.csv")
 ```
 
+``` r
+data(dennys)
+data(laquinta)
+```
+
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+Back to the Denny’s and La Quinta data sets! First, I will start by
+filtering the Dennys data set for only Alaska locations.
+
+``` r
+dn_ak <- dennys %>%
+  filter(state == "AK")
+nrow(dn_ak)
+```
+
+    ## [1] 3
+
+There are three Denny’s locations in the state of Alaska. Now for the La
+Quinta locations.
+
+``` r
+lq_ak <- laquinta %>%
+  filter(state == "AK")
+nrow(lq_ak)
+```
+
+    ## [1] 2
+
+There are 2 total La Quinta locations in the state of Alaska.
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 1 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+Now we are interested in the distances between each Denny’s location
+from each La Quinta location. To do so, we must calculate the distance
+between six total pairings, for each of the three Dennys locations, I
+will compare them to the two La Quinta locations to measure six total
+distances.
 
 ### Exercise 3
 
-…
+To do so, we will begin by joining our data sets that we are more easily
+able to compare distances through pairing.
+
+``` r
+dn_lq_ak <- full_join(dn_ak, lq_ak,
+  by = "state")
+```
+
+    ## Warning in full_join(dn_ak, lq_ak, by = "state"): Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## ℹ Row 1 of `x` matches multiple rows in `y`.
+    ## ℹ Row 1 of `y` matches multiple rows in `x`.
+    ## ℹ If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
+
+``` r
+dn_lq_ak
+```
+
+    ## # A tibble: 6 × 11
+    ##   address.x     city.x state zip.x longitude.x latitude.x address.y city.y zip.y
+    ##   <chr>         <chr>  <chr> <chr>       <dbl>      <dbl> <chr>     <chr>  <chr>
+    ## 1 2900 Denali   Ancho… AK    99503       -150.       61.2 3501 Min… "\nAn… 99503
+    ## 2 2900 Denali   Ancho… AK    99503       -150.       61.2 4920 Dal… "\nFa… 99709
+    ## 3 3850 Debarr … Ancho… AK    99508       -150.       61.2 3501 Min… "\nAn… 99503
+    ## 4 3850 Debarr … Ancho… AK    99508       -150.       61.2 4920 Dal… "\nFa… 99709
+    ## 5 1929 Airport… Fairb… AK    99701       -148.       64.8 3501 Min… "\nAn… 99503
+    ## 6 1929 Airport… Fairb… AK    99701       -148.       64.8 4920 Dal… "\nFa… 99709
+    ## # ℹ 2 more variables: longitude.y <dbl>, latitude.y <dbl>
+
+Now we have a separate data frame with all six combinations of our two
+organizations.
 
 ### Exercise 4
 
-…
+``` r
+view(dn_lq_ak)
+```
+
+In this new data frame that we just created, there are six total
+observations which each represent a pairing of a Denny’s locations and a
+La Quinta location. The names in this data frame are similar to those of
+the original data frames but are doubled to represent both the Dennys
+location and the La Quinta location. Variables include address, city,
+state, zip, longitude, and latitude. The Denny’s locations are marked
+with .x after these variables while the La Quinta location variables end
+with .y to seperate these two data frames.
 
 ### Exercise 5
 
-…
+``` r
+haversine <- function(long1, lat1, long2, lat2, round = 3) {
+  long1 <- long1 * pi / 180
+  lat1 <- lat1 * pi / 180
+  long2 <- long2 * pi / 180
+  lat2 <- lat2 * pi / 180
+
+  R <- 6371 
+
+  a <- sin((lat2 - lat1) / 2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1) / 2)^2
+  d <- R * 2 * asin(sqrt(a))
+
+  return(round(d, round))
+}
+```
 
 ### Exercise 6
 
-…
+Now I will calculate each of the six distances to create a new distance
+variable for each pairing.
 
-Add exercise headings as needed.
+``` r
+dn_lq_ak <- dn_lq_ak %>%
+  mutate(distance = mapply(haversine, 
+                           longitude.x, latitude.x, 
+                           longitude.y, latitude.y))
+```
+
+### Exercise 7
+
+Now with this new variable, I will calculate the minimum distance
+between a Denny’s and a La Quinta for each Denny’s location.
+
+``` r
+dn_min_dist <- dn_lq_ak %>%
+  group_by(address.x) %>% 
+  summarize(closest_lq_dist = min(distance, na.rm = TRUE))
+
+head(dn_min_dist)
+```
+
+    ## # A tibble: 3 × 2
+    ##   address.x        closest_lq_dist
+    ##   <chr>                      <dbl>
+    ## 1 1929 Airport Way            5.20
+    ## 2 2900 Denali                 2.04
+    ## 3 3850 Debarr Road            6.00
