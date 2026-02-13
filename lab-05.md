@@ -523,10 +523,47 @@ ggplot(dn_lq_ca, aes(x = reorder(address.x, min_dist), y = min_dist)) +
 ![](lab-05_files/figure-gfm/bar-plot-ca-1.png)<!-- -->
 
 Similar to Texas, but even more so, this distribution is quite large and
-very spread out.
+very spread out. As there are over 400 Denny’s locations in California,
+there are many bars within this bar plot.
 
 ### Exercise 12
 
-### Exercise 13
+Here, I will resumarize the summary statistics for each of the four
+states analyzed, Alaska, North Carolina, Texas, and California.
 
-### Exercise 14
+``` r
+summary(dn_lq_ak$min_dist)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   2.035   2.825   5.197   4.410   5.798   5.998
+
+``` r
+summary(dn_lq_nc$min_dist)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   1.779  22.388  53.456  65.444  93.985 187.935
+
+``` r
+summary(dn_lq_tx$min_dist)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##  0.0160  0.7305  3.3715  5.7918  6.6303 60.5820
+
+``` r
+summary(dn_lq_ca$min_dist)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   0.016   5.722  11.897  22.083  22.857 253.462
+
+According to the data output, Texas is clearly the most representative
+of the Mitch Hedberg’s joke as they possess the lowest minimum distance
+(0.016 km), the lowest 1st quartile (0.731 km) and the lowest median
+(3.372 km). With these factors, and a mean only slightly greater than
+that of Alaska’s, Texas is clearly the best state to showcase if you
+would like to prove Mitch Hedberg’s joke true.
+
+What a cool experiment?
