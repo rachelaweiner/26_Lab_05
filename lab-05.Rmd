@@ -96,14 +96,247 @@ dn_lq_ak <- dn_lq_ak %>%
 
 ### Exercise 7
 
-Now with this new variable, I will calculate the minimum distance between a Denny's and a La Quinta for each Denny's location.
+Now with this new variable, I will calculate the minimum distance between a Denny's and a La Quinta for each Denny's location by creating a new variable.
 
-```{r}
-dn_min_dist <- dn_lq_ak %>%
-  group_by(address.x) %>% 
-  summarize(closest_lq_dist = min(distance, na.rm = TRUE))
-
-head(dn_min_dist)
+```{r min-distance}
+dn_lq_ak <- dn_lq_ak %>%
+  group_by(address.x) %>%
+  mutate(min_dist = min(distance, na.rm = TRUE)) %>%
+  ungroup()
 ```
 
+### Exercise 8
 
+Let's visualize this new variable of minimum distances. 
+
+```{r summary-stats}
+summary(dn_lq_ak$min_dist)
+```
+
+```{r bar-plot}
+ggplot(dn_lq_ak, aes(x = reorder(address.x, min_dist), y = min_dist)) +
+  geom_col() +
+  labs(title = "Distance to Nearest La Quinta by Denny's Location in Alaska",
+    x = "Denny's Address",
+    y = "Minimum Distance (km)")
+```
+
+The distribution of distances between the three Denny's locations and the closest La Quinta are displayed above. We can describe this distribution as negatively skewed and unimodal. The least distance between a Denny's restauraunt and a La Quinta hotel is found at 2900 Denali in Anchorage Alaska with a distance of 2.035 km to the Anchorage La Quinta location.
+
+Now that we have a good idea of these distances in the consolidated state of Alaska, let's try North Carolina!
+
+### Exercise 9
+
+I am going to repeat exercises 1-9 for North Carolina.
+
+```{r count-rows-dennys-nc}
+dn_nc <- dennys %>%
+  filter(state == "NC")
+nrow(dn_nc)
+```
+
+There are 28 total Denny's locations in the state of North Carolina. Now for the La Quinta locations.
+
+```{r count-rows-laquinta-nc}
+lq_nc <- laquinta %>%
+  filter(state == "NC")
+nrow(lq_nc)
+```
+
+There are 12 total La Quinta locations in the state of North Carolina.
+
+```{r join-data-frames-nc}
+dn_lq_nc <- full_join(dn_nc, lq_nc,
+  by = "state")
+dn_lq_nc
+```
+
+Now we have a separate data frame with all 336 combinations of Denny's and La Quinta North Carolina locations. 
+
+```{r view-joined-data-frame-nc}
+view(dn_lq_nc)
+```
+
+In this new data frame that we just created, there are 336 total observations which each represent a pairing of a Denny's locations and a La Quinta location. The Denny's locations are marked with .x after these variables while the La Quinta location variables end with .y to separate these two data frames. 
+
+Now to create the distance variable.
+
+```{r calculate-distance-nc}
+dn_lq_nc <- dn_lq_nc %>%
+  mutate(distance = mapply(haversine, 
+                           longitude.x, latitude.x, 
+                           longitude.y, latitude.y))
+```
+
+Now with this new variable, I will calculate the minimum distance between a Denny's and a La Quinta for each Denny's location by creating a new variable, min_dist.
+
+```{r min-distance-nc}
+dn_lq_nc <- dn_lq_nc %>%
+  group_by(address.x) %>%
+  mutate(min_dist = min(distance, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+Let's visualize this new variable of minimum distances in North Carolina. 
+
+```{r}
+summary(dn_lq_nc$min_dist)
+```
+
+```{r bar-plot-nc}
+ggplot(dn_lq_nc, aes(x = reorder(address.x, min_dist), y = min_dist)) +
+  geom_col() +
+  labs(title = "Distance to Nearest La Quinta by Denny's Location in North Carolina",
+    x = "Denny's Address",
+    y = "Minimum Distance (km)")
+```
+
+As there are 28 total Denny's locations in the state of North Carolina, it makes sense that there are many more bars represented in this bar plot. This makes it more difficult to read individual addresses but we are able to get a very clear idea of the distribution across minimum distances between locations.
+
+This distribution follows a similar trend as the Alaska locations with a minimum distance being 1.7 kms. 
+
+Now, let's do this one more time for the state of Texas!
+
+### Exercise 10
+
+I am going to repeat exercises 1-9 for the state of Texas.
+
+```{r count-rows-dennys-tx}
+dn_tx <- dennys %>%
+  filter(state == "TX")
+nrow(dn_tx)
+```
+
+There are 200 total Denny's locations in the state of Texas. Now for the La Quinta locations.
+
+```{r count-rows-laquinta-tx}
+lq_tx <- laquinta %>%
+  filter(state == "TX")
+nrow(lq_tx)
+```
+
+There are 237 total La Quinta locations in the state of Texas.
+
+```{r join-data-frames-tx}
+dn_lq_tx <- full_join(dn_tx, lq_tx,
+  by = "state")
+dn_lq_tx
+```
+
+Now we have a separate data frame with all combinations of Denny's and La Quinta North Texas locations. 
+
+```{r view-joined-data-frame-tx}
+view(dn_lq_tx)
+```
+
+In this new data frame that we just created, there are 47,400 total observations which each represent a pairing of a Denny's locations and a La Quinta location. This is a much larger number than both Alaska and North Carolina due to the large number of Denny's locations and La Quinta locations. The Denny's locations are marked with .x after these variables while the La Quinta location variables end with .y to separate these two data frames. 
+
+Now to create the distance variable.
+
+```{r calculate-distance-tx}
+dn_lq_tx <- dn_lq_tx %>%
+  mutate(distance = mapply(haversine, 
+                           longitude.x, latitude.x, 
+                           longitude.y, latitude.y))
+```
+
+Now with this new variable, I will calculate the minimum distance between a Denny's and a La Quinta for each Denny's location by creating a new variable, min_dist.
+
+```{r min-distance-tx}
+dn_lq_tx <- dn_lq_tx %>%
+  group_by(address.x) %>%
+  mutate(min_dist = min(distance, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+Let's visualize this new variable of minimum distances in Texas. 
+
+```{r summary-stats-tx}
+summary(dn_lq_tx$min_dist)
+```
+
+```{r bar-plot-tx}
+ggplot(dn_lq_tx, aes(x = reorder(address.x, min_dist), y = min_dist)) +
+  geom_col() +
+  labs(title = "Distance to Nearest La Quinta by Denny's Location in Texas",
+    x = "Denny's Address",
+    y = "Minimum Distance (km)")
+```
+
+Wow! Things sure are bigger in Texas! Now that we have a total of 200 Denny's, we have a much larger set of x values for our x axis, making this visualization quite difficult to read. 
+
+I lied, I am going to conduct this same analysis on one more state of my choosing: California!
+
+### Exercise 11
+
+I am going to repeat exercises 1-9 for California.
+
+```{r count-rows-dennys-ca}
+dn_ca <- dennys %>%
+  filter(state == "CA")
+nrow(dn_ca)
+```
+
+There are 28 total Denny's locations in the state of North Carolina. Now for the La Quinta locations.
+
+```{r count-rows-laquinta-ca}
+lq_ca <- laquinta %>%
+  filter(state == "CA")
+nrow(lq_ca)
+```
+
+There are 12 total La Quinta locations in the state of North Carolina.
+
+```{r join-data-frames-ca}
+dn_lq_ca <- full_join(dn_ca, lq_ca,
+  by = "state")
+dn_lq_ca
+```
+
+Now we have a separate data frame with all 336 combinations of Denny's and La Quinta North Carolina locations. 
+
+```{r view-joined-data-frame-ca}
+view(dn_lq_ca)
+```
+
+In this new data frame that we just created, there are 336 total observations which each represent a pairing of a Denny's locations and a La Quinta location. The Denny's locations are marked with .x after these variables while the La Quinta location variables end with .y to separate these two data frames. 
+
+Now to create the distance variable.
+
+```{r calculate-distance-ca}
+dn_lq_ca <- dn_lq_ca %>%
+  mutate(distance = mapply(haversine, 
+                           longitude.x, latitude.x, 
+                           longitude.y, latitude.y))
+```
+
+Now with this new variable, I will calculate the minimum distance between a Denny's and a La Quinta for each Denny's location by creating a new variable, min_dist.
+
+```{r min-distance-ca}
+dn_lq_ca <- dn_lq_ca %>%
+  group_by(address.x) %>%
+  mutate(min_dist = min(distance, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+Let's visualize this new variable of minimum distances in North Carolina. 
+
+```{r summary-stats-ca}
+summary(dn_lq_ca$min_dist)
+```
+
+```{r bar-plot-ca}
+ggplot(dn_lq_ca, aes(x = reorder(address.x, min_dist), y = min_dist)) +
+  geom_col() +
+  labs(title = "Distance to Nearest La Quinta by Denny's Location in California",
+    x = "Denny's Address",
+    y = "Minimum Distance (km)")
+```
+
+Similar to Texas, but even more so, this distribution is quite large and very spread out. 
+
+### Exercise 12
+
+### Exercise 13
+
+### Exercise 14
